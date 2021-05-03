@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.TableOrderDao">
+    <insert id="insertWithOutId">
+        insert into table_order (order_num, order_time, order_state, user_id, user_name, user_note, user_address,
+                                 user_phone, customer_id)
+        VALUES (#{orderNum}, now(), #{orderState}, #{userId}, #{userName}, #{userNote}, #{userAddress}, #{userPhone},
+                #{customerId})
+    </insert>
+
+
+    <select id="selectPage" resultType="cn.f33v.app.entity.TableOrder">
+        select * from table_order
+        <where>
+            <if test="username!=null  and username!=''">
+                user_name=#{username}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
+

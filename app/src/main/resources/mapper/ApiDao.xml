@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.ApiDao">
+
+    <resultMap type="cn.f33v.app.entity.Api" id="ApiMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="apiId" column="api_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="method" column="method" jdbcType="VARCHAR"/>
+        <result property="pid" column="pid" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="listApiInfoBack" resultType="cn.f33v.app.dto.ApiBackDTO">
+        select
+        id,api_id,name,url,method,pid,description,sort
+        from api
+        <where>
+            <if test="apiId!=null">
+                api_id=#{apiId}
+                or pid=#{apiId}
+            </if>
+        </where>
+        limit #{current},#{size}
+    </select>
+    <select id="listApiByRoleId" resultType="cn.f33v.app.entity.Api">
+        select api.id,
+               api.api_id,
+               api.description,
+               api.sort,
+               api.pid,
+               api.method,
+               api.url,
+               api.name
+        from api
+                 join role_api on api.id = role_api.api_id
+                 join role on role_api.role_id = role.id
+        where role.id = #{roleId}
+    </select>
+
+</mapper>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.UserDao">
+
+
+    <select id="listUserRolesByUsername" resultType="java.lang.String">
+        select role.role_name
+        from role,
+             user,
+             role_user
+        where role.id = role_user.role_id
+          and user.id = role_user.user_id
+          and user.username = #{username}
+    </select>
+    <select id="getUserListPage" resultType="cn.f33v.app.dto.UserListPagDTO">
+        select a.id userId,a.nickname nickname,a.avatar avatar,a.create_time createTime,a.update_time
+        updateTime,a.is_silence isSilence,b.description description
+        from user a
+        inner join role_user c on a.id=c.user_id
+        inner join role b on c.role_id=b.id
+        <where>
+            <if test="roleName!=null and roleName!=''">
+                b.description=#{roleName}
+            </if>
+            <if test="nickname!=null and nickname!=''">
+                and a.nickname like "%"#{nickname}"%"
+            </if>
+        </where>
+    </select>
+    <select id="getApiUrlByUsername" resultType="cn.f33v.app.entity.Api">
+        select *
+        from api c,
+             (select a.role_id
+              from role_user a,
+                   user b
+              where a.user_id = b.id
+                and b.username = #{username}) t,
+             role_api d
+        where d.role_id = t.role_id
+          and d.api_id = c.id
+    </select>
+</mapper>
+

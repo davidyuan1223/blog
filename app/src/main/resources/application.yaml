@@ -1,0 +1,50 @@
+
+spring:
+
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      max-wait: 60000
+      initial-size: 10
+      min-idle: 10
+      max-active: 100
+      max-wait-thread-count: 6
+      stat-view-servlet:
+        enabled: true
+        login-username: admin
+        login-password: 123456
+        url-pattern: /druid/*
+      filters: stat,wall
+    url: jdbc:mysql://localhost:3306/myblog?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+  mail:
+    host: smtp.163.com
+    username: y1406957364@163.com
+    password: 6128444146
+    default-encoding: UTF-8
+    protocol: smtp
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  redis:
+    database: 0
+    host: 123.56.158.253
+    port: 6379
+    jedis:
+      pool:
+        max-active: 5000
+        max-idle: 100
+        min-idle: 1
+        max-wait: -1
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  type-aliases-package: cn.f33v.app.dao
+

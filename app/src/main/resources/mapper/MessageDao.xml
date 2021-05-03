@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.MessageDao">
+
+    <resultMap type="cn.f33v.app.entity.Message" id="MessageMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="ipAddress" column="ip_address" jdbcType="VARCHAR"/>
+        <result property="ipSource" column="ip_source" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="messageContent" column="message_content" jdbcType="VARCHAR"/>
+        <result property="time" column="time" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="MessageMap">
+        select id,
+               ip_address,
+               ip_source,
+               nickname,
+               avatar,
+               message_content,
+               time,
+               create_time
+        from myblog.message
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="MessageMap">
+        select id,
+               ip_address,
+               ip_source,
+               nickname,
+               avatar,
+               message_content,
+               time,
+               create_time
+        from myblog.message
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="MessageMap">
+        select
+        id, ip_address, ip_source, nickname, avatar, message_content, time, create_time
+        from myblog.message
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="ipAddress != null and ipAddress != ''">
+                and ip_address = #{ipAddress}
+            </if>
+            <if test="ipSource != null and ipSource != ''">
+                and ip_source = #{ipSource}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname = #{nickname}
+            </if>
+            <if test="avatar != null and avatar != ''">
+                and avatar = #{avatar}
+            </if>
+            <if test="messageContent != null and messageContent != ''">
+                and message_content = #{messageContent}
+            </if>
+            <if test="time != null">
+                and time = #{time}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into myblog.message(ip_address, ip_source, nickname, avatar, message_content, time, create_time)
+        values (#{ipAddress}, #{ipSource}, #{nickname}, #{avatar}, #{messageContent}, #{time}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into myblog.message(ip_address, ip_source, nickname, avatar, message_content, time, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.ipAddress}, #{entity.ipSource}, #{entity.nickname}, #{entity.avatar}, #{entity.messageContent},
+            #{entity.time}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into myblog.message(ip_address, ip_source, nickname, avatar, message_content, time, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.ipAddress}, #{entity.ipSource}, #{entity.nickname}, #{entity.avatar}, #{entity.messageContent},
+            #{entity.time}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        ip_address = values(ip_address) , ip_source = values(ip_source) , nickname = values(nickname) , avatar =
+        values(avatar) , message_content = values(message_content) , time = values(time) , create_time =
+        values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update myblog.message
+        <set>
+            <if test="ipAddress != null and ipAddress != ''">
+                ip_address = #{ipAddress},
+            </if>
+            <if test="ipSource != null and ipSource != ''">
+                ip_source = #{ipSource},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <if test="messageContent != null and messageContent != ''">
+                message_content = #{messageContent},
+            </if>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from myblog.message
+        where id = #{id}
+    </delete>
+
+</mapper>
+

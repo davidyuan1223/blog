@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.CommentDao">
+
+    <select id="listComments" resultType="cn.f33v.app.dto.CommentDTO">
+        select a.id,a.user_id,b.nickname,b.avatar,a.comment_content,a.create_time
+        from comment a inner join user b on b.id=a.user_id
+        where
+        <if test="articleId!=null">
+            a.article_id=#{articleId}
+        </if>
+        and a.is_delete=0
+        and parent_id is null
+        order by a.create_time limit #{current},10
+    </select>
+    <select id="listReplies" resultType="cn.f33v.app.dto.ReplyDTO">
+        select * from
+        (select
+        a.user_id,u.nickname,u.avatar,a.reply_id,r.nickname as reply_nickname,
+        a.id,a.parent_id,a.comment_content,a.create_time,
+        row_number() over (partition by parent_id order by a.create_time )row_num
+        from comment a join user u on a.user_id = u.id
+        join user r on a.reply_id=r.id
+        where a.is_delete=0
+        and parent_id in
+        (<foreach collection="commentIdList" item="commentId" separator=",">
+        #{commentId}
+    </foreach> )) t
+        where 4>row_num
+    </select>
+    <select id="listReplyCountByCommentId" resultType="cn.f33v.app.dto.ReplyCountDTO">
+        select parent_id as comment_id,count(1) as reply_count
+        from comment
+        where is_delete=0 and parent_id in
+        (<foreach collection="commentIdList" item="commentId" separator=",">
+        #{commentId}
+    </foreach> )
+        order by parent_id
+    </select>
+    <select id="listRepliesByCommentId" resultType="cn.f33v.app.dto.ReplyDTO">
+        select a.user_id,
+               u.nickname,
+               u.avatar,
+               a.reply_id,
+               r.nickname as reply_nickname,
+               a.id,
+               a.parent_id,
+               a.comment_content,
+               a.create_time
+        from comment a
+                 join user u on a.user_id = u.id
+                 join user r on a.reply_id = r.id
+        where a.is_delete = 0
+          and parent_id = #{commentId}
+        order by create_time
+        limit #{current},5
+    </select>
+    <select id="getUserReplyList" resultType="cn.f33v.app.dto.CommentBackDTO">
+        select a.user_id,b.avatar,b.nickname,a.reply_id,d.nickname as reply_nickname,
+        a.article_id,c.article_title,a.create_time,a.comment_content
+        from comment a,user b,article c,user d
+        where d.id=a.user_id and a.user_id=b.id and c.id=a.article_id
+        <if test='nickname!=null and nickname!=""'>
+            and b.nickname=#{nickname}
+        </if>
+        limit #{current},#{size}
+    </select>
+</mapper>
+

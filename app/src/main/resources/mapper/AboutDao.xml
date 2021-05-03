@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.AboutDao">
+
+    <resultMap type="cn.f33v.app.dto.AboutDTO" id="AboutMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+    </resultMap>
+    <update id="updateAbout">
+        update about
+        set content=#{aboutContent}
+        where id = 1
+    </update>
+    <select id="getAbout" resultType="cn.f33v.app.dto.AboutDTO">
+        select *
+        from about;
+    </select>
+
+
+</mapper>
+

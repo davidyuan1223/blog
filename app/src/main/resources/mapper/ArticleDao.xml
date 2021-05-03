@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.ArticleDao">
+    <resultMap id="getArticleListMap" type="cn.f33v.app.dto.ListArticleDTO">
+        <id column="id" property="articleId"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_top" property="isTop"/>
+        <collection property="tagsName" ofType="string">
+            <result column="tag_name"/>
+        </collection>
+    </resultMap>
+    <select id="getArticleList" resultMap="getArticleListMap">
+        select
+        a.id,a.article_title,b.category_name,d.tag_name,a.create_time,a.update_time,a.is_top
+        from (
+        select * from article limit #{current},#{size}
+        ) a
+        inner join category b on a.category_id=b.id
+        inner join article_tag c on a.id=c.article_id
+        inner join tag d on c.tag_id=d.id
+        <where>
+            <if test='articleTitle!=null and articleTitle!="" '>
+                a.article_title = #{articleTitle}
+            </if>
+        </where>
+    </select>
+    <resultMap id="listArticles" type="cn.f33v.app.dto.ArticleHomeDTO">
+        <id column="id" property="articleId"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="article_cover" property="articleCover"/>
+        <result column="article_content" property="articleContent"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="is_top" property="isTop"/>
+        <result column="create_time" property="createTime"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="cn.f33v.app.dto.TagDTO">
+            <id column="id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+    <select id="listArticles" resultMap="listArticles">
+        select a.id,
+               a.article_title,
+               a.article_cover,
+               a.article_content,
+               a.category_id,
+               a.is_top,
+               b.category_name,
+               d.id,
+               d.tag_name
+        from article a,
+             category b,
+             article_tag c,
+             tag d
+        where a.category_id = b.id
+          and a.id = c.article_id
+          and c.tag_id = d.id
+        order by is_top desc, a.create_time desc
+        limit #{current},10
+    </select>
+    <select id="listArchives" resultType="cn.f33v.app.dto.ArchiveDTO">
+        select id, article_title, create_time
+        from article
+        order by create_time desc
+    </select>
+    <resultMap id="listArticleByConditionResultMap" type="cn.f33v.app.dto.ArticlePreviewDTO">
+        <id column="id" property="id"/>
+        <result column="article_cover" property="articleCover"/>
+        <result column="article_title" property="articleTitle"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="tagDTOList" ofType="cn.f33v.app.dto.TagDTO">
+            <id column="id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+    <select id="listArticlesByCondition" resultMap="listArticleByConditionResultMap">
+        select a.id,
+               a.article_cover,
+               a.article_title,
+               b.category_name,
+               a.category_id,
+               a.create_time,
+               d.id,
+               d.tag_name
+        from article a,
+             category b,
+             article_tag c,
+             tag d
+        where a.category_id = b.id
+          and a.id = c.article_id
+          and c.tag_id = d.id
+          and b.id = #{categoryId}
+    </select>
+    <select id="listTagsByCondition" resultMap="listArticleByConditionResultMap">
+        select a.id,
+               a.article_cover,
+               a.article_title,
+               b.category_name,
+               a.category_id,
+               a.create_time,
+               d.id,
+               d.tag_name
+        from article a,
+             category b,
+             article_tag c,
+             tag d
+        where a.category_id = b.id
+          and a.id = c.article_id
+          and c.tag_id = d.id
+          and c.tag_id = #{tagId}
+    </select>
+
+</mapper>
+

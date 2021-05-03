@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.TagDao">
+
+    <select id="listTagDTO" resultType="cn.f33v.app.dto.TagDTO">
+        select id, tag_name
+        from tag
+    </select>
+</mapper>
+

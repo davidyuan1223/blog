@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.f33v.app.dao.MenuDao">
+
+    <resultMap id="ListProduct" type="cn.f33v.app.dto.MenuDTO">
+        <id column="id" property="menuId"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="menuUrl" column="menu_url"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="sort" column="menu_sort"/>
+        <result property="description" column="description"/>
+        <collection property="children" ofType="cn.f33v.app.entity.Menu" column="id" select="listProductChildren">
+
+        </collection>
+    </resultMap>
+    <select id="listProduct" resultMap="ListProduct">
+        select distinct id, menu_name, menu_url, parent_id, menu_sort, description, menu_icon
+        from menu
+        where parent_id is null
+           or parent_id = 0
+        order by menu_sort
+    </select>
+    <select id="listProductChildren" resultMap="ListProduct">
+        select distinct id, menu_name, menu_url, parent_id, menu_sort, description, menu_icon
+        from menu
+        where parent_id = #{id}
+        order by menu_sort
+    </select>
+</mapper>
+

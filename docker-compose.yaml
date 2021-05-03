@@ -1,0 +1,40 @@
+version: '3'
+services:
+  nginx:
+    container_name: app-nginx
+    image: nginx:1.13
+    restart: always
+    ports:
+    - 8443:80
+    - 443:443
+    volumes:
+    - ./nginx/conf.d:/etc/nginx/conf.d
+  mysql:
+    container_name: app-mysql
+    image: mysql/mysql-server:8.0.11
+    environment:
+      MYSQL_DATABASE: myblog
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_HOST: '%'
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+    - /home/mysql/conf:/etc/mysql/conf.d
+    - /home/mysql/data:/var/bin/mysql
+
+    ports:
+    - "3306:3306"
+    restart: always
+  app:
+    restart: always
+    build:
+      ./app
+    working_dir: /app
+    volumes:
+    - ./app:/app
+    - ~/.m2:/root/.m2
+    expose:
+      - "8080"
+    depends_on:
+      - nginx
+      - mysql
+    command: mvn clean spring-boot:run -Dspring-boot.run.profiles=docker
